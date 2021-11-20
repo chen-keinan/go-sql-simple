@@ -29,13 +29,13 @@ func TestInClauseQueryTwoParams(t *testing.T) {
 
 func TestSelectQueryInTx(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	postgresqlMgr:= NewMockPostgresqlDriver(ctrl)
+	postgresqlMgr := NewMockPostgresqlDriver(ctrl)
 	postgresqlMgr.EXPECT().Begin().Return(SQLTx{}, nil)
- 	th := TxHandler{PgDriver: postgresqlMgr}
-	cbg := context.Background()
-	tc,err := th.getTxManager(cbg)
+	th := TxHandler{PgDriver: postgresqlMgr}
+	cbg := GetTxContext(context.Background())
+	tc, err := th.getTxManager(cbg)
 	if err != nil {
 		t.Errorf("failed")
 	}
-	assert.NotNilf(t, tc,"tx manager is nil")
+	assert.NotNilf(t, tc, "tx manager is nil")
 }

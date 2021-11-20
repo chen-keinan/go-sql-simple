@@ -164,10 +164,10 @@ func (th *TxHandler) getTxManager(ctx context.Context) (TxMgr, error) {
 	var ctxn context.Context
 	var txData *Tx
 	if contextValue == nil {
-		ctxn = th.GetTxContext(ctx)
+		ctxn = GetTxContext(ctx)
 		contextValue = ctxn.Value("tx")
 	}
-	txData= contextValue.(*Tx)
+	txData = contextValue.(*Tx)
 	if txData.isRolledBack {
 		return nil, fmt.Errorf("tx has been rolled back")
 	}
@@ -180,7 +180,7 @@ func (th *TxHandler) getTxManager(ctx context.Context) (TxMgr, error) {
 	}
 	return txData.txManager, nil
 }
-func (th *TxHandler) GetTxContext(ctx context.Context) context.Context {
+func GetTxContext(ctx context.Context) context.Context {
 	return context.WithValue(ctx, "tx", &Tx{})
 }
 
