@@ -1,1 +1,1 @@
-# sql-raw-data-example
+# go-sql-simple
