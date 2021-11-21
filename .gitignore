@@ -16,4 +16,5 @@ fmtcoverage.html
 coverage.md
 coverage.out
 *.iml
+mock*
 
