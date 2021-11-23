@@ -58,7 +58,7 @@ func (th TxHandler) SeclectQueryTx(ctx context.Context, query string, obj interf
 		rows, err = tx.Query(query, params...)
 	}
 	if err != nil {
-		err := th.RollBack(ctx)
+		err := th.rollBack(ctx)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func (th TxHandler) processResultSet(ctx context.Context, rows RowMgr, obj inter
 
 		// Scan the result into the column pointers...
 		if err := rows.Scan(columnPointers...); err != nil {
-			err := th.RollBack(ctx)
+			err := th.rollBack(ctx)
 			if err != nil {
 				return err
 			}
@@ -99,7 +99,7 @@ func (th TxHandler) processResultSet(ctx context.Context, rows RowMgr, obj inter
 
 func (th TxHandler) SeclectQueryInClauseTx(ctx context.Context, obj interface{}, query string, params []interface{}) error {
 	if len(params) == 0 {
-		err := th.RollBack(ctx)
+		err := th.rollBack(ctx)
 		if err != nil {
 			return err
 		}
@@ -138,7 +138,7 @@ func (th TxHandler) ExecuteInClauseTx(ctx context.Context, query string, params 
 	}
 	rs, err := tx.Exec(q, args...)
 	if err != nil {
-		err := th.RollBack(ctx)
+		err := th.rollBack(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +184,7 @@ func GetTxContext(ctx context.Context) context.Context {
 	return context.WithValue(ctx, "tx", &Tx{})
 }
 
-func (th TxHandler) RollBack(ctx context.Context) error {
+func (th TxHandler) rollBack(ctx context.Context) error {
 	tx, err := th.getTxManager(ctx)
 	if err != nil {
 		return err
@@ -193,7 +193,7 @@ func (th TxHandler) RollBack(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	th.MarkTxAsRollBacked(ctx)
+	th.markTxAsRollBacked(ctx)
 	return nil
 }
 
@@ -209,10 +209,12 @@ func (th TxHandler) Commit(ctx context.Context) error {
 	return nil
 }
 
-func (th TxHandler) MarkTxAsRollBacked(ctx context.Context) {
+func (th TxHandler) markTxAsRollBacked(ctx context.Context) {
 	contextValue := ctx.Value("tx")
 	txData := contextValue.(*Tx)
 	if txData.txManager != nil {
 		txData.isRolledBack = true
 	}
 }
+
+
