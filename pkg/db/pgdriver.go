@@ -6,12 +6,11 @@ import (
 	"time"
 	//no golint
 	_ "github.com/lib/pq"
-	"go.uber.org/zap"
 )
 
 //PostgresqlDriver interface
 //pgdriver.go
-//go:generate mockgen -destination=./mock_PostgresqlDriver.go -package=mocks . PostgresqlDriver
+//go:generate mockgen -destination=./mocks/mock_PostgresqlDriver.go -package=mocks . PostgresqlDriver
 type PostgresqlDriver interface {
 	Close() error
 	Begin() (TxMgr, error)
@@ -20,7 +19,7 @@ type PostgresqlDriver interface {
 
 //TxMgr interface
 //pgdriver.go
-//go:generate mockgen -destination=./mock_TxMgr.go -package=mocks . TxMgr
+//go:generate mockgen -destination=./mocks/mock_TxMgr.go -package=mocks . TxMgr
 type TxMgr interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
 	Commit() error
@@ -30,7 +29,7 @@ type TxMgr interface {
 
 //RowMgr interface
 //pgdriver.go
-//go:generate mockgen -destination=./mock_RowMgr.go -package=mocks . RowMgr
+//go:generate mockgen -destination=./mocks/mock_RowMgr.go -package=mocks . RowMgr
 type RowMgr interface {
 	Scan(dest ...interface{}) error
 	Next() bool
@@ -61,14 +60,13 @@ func NewPostgresqlMgr(pgDriver *sql.DB) PostgresqlDriver {
 //NewPGDriver create new postgresql driver instance
 // accept config and logger
 // return instance of sql db
-func NewPGDriver(c Connector, zap *zap.Logger) *sql.DB {
+func NewPGDriver(c Connector) (*sql.DB,error) {
 	// open database
 	db, err := connectToPostgresqlWithRetries(c)
 	if err != nil {
-		panic(err.Error())
+		return nil,err
 	}
-	zap.Info(fmt.Sprintf("connected to pg db with connnection url %s:%s/%s", c.host, c.port, c.db))
-	return db
+ 	return db,nil
 }
 
 func connectToPostgresqlWithRetries(c Connector) (*sql.DB, error) {
