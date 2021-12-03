@@ -5,7 +5,7 @@ operation with transaction whilst avoiding boilte plate code
 
 
 * [Installation](#installation)
-* [Supported Configuration Files](#supported-configuration-files)
+* [Supported DBs](#supported-dbs)
 * [Usage](#usage)
 
 ## Installation
@@ -14,7 +14,7 @@ operation with transaction whilst avoiding boilte plate code
 go get github.com/chen-keinan/go-sql-simple
 ```
 
-## Supported DBs files:
+## Supported DBs:
 
 - postgresql
 
