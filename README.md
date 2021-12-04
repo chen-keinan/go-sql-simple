@@ -1,3 +1,5 @@
+<br><img src="./pkg/img/go-sql-simple.png" width="300" alt="sql-simple.png logo"><br>
+
 # go-sql-simple
 
 Go-Sql-simple  is an open source sql lib for for making simple sql
