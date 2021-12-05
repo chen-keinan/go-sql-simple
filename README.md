@@ -23,8 +23,15 @@ go get github.com/chen-keinan/go-sql-simple
 ## Usage
 ```go
 
+import (
+    "context"
+    "fmt"
+    "github.com/chen-keinan/go-sql-simple/pkg/db"
+)
+
 func main() {
-    connector := db.NewConnector("user", "password", "5432", "db", "host", "postgres")
+    
+	connector := db.NewConnector("user", "password", "5432", "db", "host", "postgres")
     driver, err := db.NewPGDriver(connector)
     if err != nil {
         panic(err)
