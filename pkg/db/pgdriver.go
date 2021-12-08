@@ -39,7 +39,7 @@ type RowMgr interface {
 
 //Rows encapsulate sql rows object
 type Rows struct {
-	rowMgr  *sql.Rows
+	rowMgr *sql.Rows
 }
 
 //SQLTx encapsulate sql tx object
@@ -60,13 +60,13 @@ func NewPostgresqlMgr(pgDriver *sql.DB) PostgresqlDriver {
 //NewPGDriver create new postgresql driver instance
 // accept config and logger
 // return instance of sql db
-func NewPGDriver(c Connector) (*sql.DB,error) {
+func NewPGDriver(c Connector) (*sql.DB, error) {
 	// open database
 	db, err := connectToPostgresqlWithRetries(c)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
- 	return db,nil
+	return db, nil
 }
 
 func connectToPostgresqlWithRetries(c Connector) (*sql.DB, error) {
@@ -77,7 +77,7 @@ func connectToPostgresqlWithRetries(c Connector) (*sql.DB, error) {
 		psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 			"password=%s dbname=%s sslmode=disable",
 			c.host, c.port, c.user, c.password, c.db)
-		if db, err = sql.Open(c.sqlType,psqlInfo); err != nil {
+		if db, err = sql.Open(c.sqlType, psqlInfo); err != nil {
 			err = fmt.Errorf("failed to connect to pg db with connnection url %s:%s/%s error:%s", c.host, c.port, c.db, err.Error())
 			time.Sleep(time.Second * 4)
 			continue

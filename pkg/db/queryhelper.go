@@ -216,5 +216,3 @@ func (th TxHandler) markTxAsRollBacked(ctx context.Context) {
 		txData.isRolledBack = true
 	}
 }
-
-
