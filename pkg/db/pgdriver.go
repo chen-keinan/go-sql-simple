@@ -149,7 +149,7 @@ func (r Rows) Scan(params ...interface{}) error {
 	return r.rowMgr.Scan(params...)
 }
 
-//Scan scan query results
+//Columns return query columns
 //accept columns variables as pointers
 // return error
 func (r Rows) Columns() ([]string, error) {

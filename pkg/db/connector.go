@@ -10,6 +10,7 @@ type Connector struct {
 	sqlType  string
 }
 
+//NewConnector return new connector
 func NewConnector(user, password, port, db, host, sqlType string) Connector {
 	return Connector{user: user, password: password, port: port, db: db, sqlType: sqlType}
 }

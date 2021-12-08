@@ -10,6 +10,13 @@ import (
 	"go.uber.org/zap"
 )
 
+type key int
+
+const (
+	//TxKey context key
+	TxKey key = iota
+)
+
 //InClauseQuery prepare args for In Clause query
 //accept query and params
 // return query , args and error
@@ -45,7 +52,7 @@ func InClauseQueryTwoParams(query string, argOne, argTwo []interface{}) (string,
 	return q, sqlArgs, nil
 }
 
-//ExecuteTx execute query in tx
+//SeclectQueryTx execute query in tx
 func (th TxHandler) SeclectQueryTx(ctx context.Context, query string, obj interface{}, params ...interface{}) error {
 	tx, err := th.getTxManager(ctx)
 	if err != nil {
@@ -89,14 +96,17 @@ func (th TxHandler) processResultSet(ctx context.Context, rows RowMgr, obj inter
 		// Create our map, and retrieve the value for each column from the pointers slice,
 		// storing it in the map with the name of the column as the key.
 		for i, colName := range cols {
-			val := columnPointers[i].(*interface{})
-			m[colName] = *val
+			val, ok := columnPointers[i].(*interface{})
+			if ok {
+				m[colName] = *val
+			}
 		}
 		mArr = append(mArr, m)
 	}
 	return mapstructure.Decode(mArr, obj)
 }
 
+//SeclectQueryInClauseTx execute in Clause Tx
 func (th TxHandler) SeclectQueryInClauseTx(ctx context.Context, obj interface{}, query string, params []interface{}) error {
 	if len(params) == 0 {
 		err := th.rollBack(ctx)
@@ -114,6 +124,9 @@ func (th TxHandler) SeclectQueryInClauseTx(ctx context.Context, obj interface{},
 		return err
 	}
 	rows, err := tx.Query(q, args...)
+	if err != nil {
+		return err
+	}
 	return th.processResultSet(ctx, rows, obj)
 }
 
@@ -138,7 +151,7 @@ func (th TxHandler) ExecuteInClauseTx(ctx context.Context, query string, params 
 	}
 	rs, err := tx.Exec(q, args...)
 	if err != nil {
-		err := th.rollBack(ctx)
+		err = th.rollBack(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -146,32 +159,35 @@ func (th TxHandler) ExecuteInClauseTx(ctx context.Context, query string, params 
 	return rs, err
 }
 
+//NewTxHandler return new tx handler with driver
 func NewTxHandler(pgDriver PostgresqlDriver) *TxHandler {
 	return &TxHandler{PgDriver: pgDriver}
 }
 
+//TxHandler object
 type TxHandler struct {
 	PgDriver PostgresqlDriver
 }
 
+//Tx transaction object
 type Tx struct {
 	isRolledBack bool
 	txManager    TxMgr
 }
 
 func (th *TxHandler) getTxManager(ctx context.Context) (TxMgr, error) {
-	contextValue := ctx.Value("tx")
+	contextValue := ctx.Value(TxKey)
 	var ctxn context.Context
 	var txData *Tx
 	if contextValue == nil {
 		ctxn = GetTxContext(ctx)
-		contextValue = ctxn.Value("tx")
+		contextValue = ctxn.Value(TxKey)
 	}
-	txData = contextValue.(*Tx)
-	if txData.isRolledBack {
+	txData, ok := contextValue.(*Tx)
+	if ok && txData.isRolledBack {
 		return nil, fmt.Errorf("tx has been rolled back")
 	}
-	if txData.txManager == nil {
+	if ok && txData.txManager == nil {
 		tx, err := th.PgDriver.Begin()
 		if err != nil {
 			return tx, err
@@ -180,8 +196,10 @@ func (th *TxHandler) getTxManager(ctx context.Context) (TxMgr, error) {
 	}
 	return txData.txManager, nil
 }
+
+//GetTxContext return transaction context with tx object
 func GetTxContext(ctx context.Context) context.Context {
-	return context.WithValue(ctx, "tx", &Tx{})
+	return context.WithValue(ctx, TxKey, &Tx{})
 }
 
 func (th TxHandler) rollBack(ctx context.Context) error {
@@ -197,6 +215,7 @@ func (th TxHandler) rollBack(ctx context.Context) error {
 	return nil
 }
 
+//Commit accept context and commit a tx
 func (th TxHandler) Commit(ctx context.Context) error {
 	tx, err := th.getTxManager(ctx)
 	if err != nil {
@@ -210,9 +229,9 @@ func (th TxHandler) Commit(ctx context.Context) error {
 }
 
 func (th TxHandler) markTxAsRollBacked(ctx context.Context) {
-	contextValue := ctx.Value("tx")
-	txData := contextValue.(*Tx)
-	if txData.txManager != nil {
+	contextValue := ctx.Value(TxKey)
+	txData, ok := contextValue.(*Tx)
+	if ok && txData.txManager != nil {
 		txData.isRolledBack = true
 	}
 }
