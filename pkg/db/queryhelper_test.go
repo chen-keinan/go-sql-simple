@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"github.com/chen-keinan/go-sql-simple/pkg/db/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -30,7 +29,7 @@ func TestInClauseQueryTwoParams(t *testing.T) {
 
 func TestSelectQueryInTx(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	postgresqlMgr := mocks.NewMockPostgresqlDriver(ctrl)
+	postgresqlMgr := NewMockPostgresqlDriver(ctrl)
 	postgresqlMgr.EXPECT().Begin().Return(SQLTx{}, nil)
 	th := TxHandler{PgDriver: postgresqlMgr}
 	cbg := GetTxContext(context.Background())

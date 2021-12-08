@@ -10,7 +10,7 @@ import (
 
 //PostgresqlDriver interface
 //pgdriver.go
-//go:generate mockgen -destination=./mocks/mock_PostgresqlDriver.go -package=mocks . PostgresqlDriver
+//go:generate mockgen -destination=./mock_PostgresqlDriver.go -package=db . PostgresqlDriver
 type PostgresqlDriver interface {
 	Close() error
 	Begin() (TxMgr, error)
@@ -19,7 +19,7 @@ type PostgresqlDriver interface {
 
 //TxMgr interface
 //pgdriver.go
-//go:generate mockgen -destination=./mocks/mock_TxMgr.go -package=mocks . TxMgr
+//go:generate mockgen -destination=./mock_TxMgr.go -package=db . TxMgr
 type TxMgr interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
 	Commit() error
@@ -29,7 +29,7 @@ type TxMgr interface {
 
 //RowMgr interface
 //pgdriver.go
-//go:generate mockgen -destination=./mocks/mock_RowMgr.go -package=mocks . RowMgr
+//go:generate mockgen -destination=./mock_RowMgr.go -package=db . RowMgr
 type RowMgr interface {
 	Scan(dest ...interface{}) error
 	Next() bool
