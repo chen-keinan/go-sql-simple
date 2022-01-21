@@ -17,7 +17,7 @@ lint:
 tidy:
 	$(GOMOD) tidy -v
 test:
-	@go get github.com/golang/mock/mockgen@latest
+	@go install github.com/golang/mock/mockgen@latest
 	@go install -v github.com/golang/mock/mockgen && export PATH=$GOPATH/bin:$PATH;
 	@go generate ./...
 	$(GOTEST) -short ./... -coverprofile cp.out
