@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/golang/mock v1.6.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/lib/pq v1.10.5
+	github.com/lib/pq v1.10.6
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/stretchr/testify v1.7.1
 	go.uber.org/zap v1.19.1
