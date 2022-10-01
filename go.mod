@@ -8,7 +8,7 @@ require (
 	github.com/lib/pq v1.10.5
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/stretchr/testify v1.8.0
-	go.uber.org/zap v1.19.1
+	go.uber.org/zap v1.23.0
 )
 
 require (
